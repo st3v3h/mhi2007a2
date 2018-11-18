@@ -3,6 +3,8 @@ title: "Assignment 2"
 author: "Steve Hawley"
 date: "November 18, 2018"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -11,8 +13,54 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Section 0: Load the data and packages
 
-```{r}
+```{r get_data, message=FALSE, results='markup'}
+library(foreign) #for importing spss data
+library(summarytools) #for descriptive and cross tables
+library(dplyr) #for grouping and plotting
+library(ggplot2) #for plotting
+library(effsize) #for cohen's d
+library(car) #for leven's test
+library(sjstats) #for eta squared
 
-test<-1+2
+# import the spss file. Label the factors
+data<-read.spss("Data+for+assignments.sav",to.data.frame = TRUE, add.undeclared.levels = "no")
+# import the spss file. Remove the labels (will need this later)
+data.xlab<-read.spss("Data+for+assignments.sav",to.data.frame = TRUE, use.value.labels = FALSE)
+
+# take a look at the data. See what the fields are
+head(data)
+
+#inspect the data types
+str(data)
+
+#subset the numerical data for descriptives and factor data for frequency tables
+#there's probably a better way to do this, but this is easier
+data.fac<-select(data, -age,-code,-educ,-life,-confid, -satcurwt, -satwt18, -health)
+
+```
+
+## Section 1: Pair-Samples t-test 
+
+
+
+```{r paired_samples, results='asis'}
+
+d<-data %>% select(satcurwt, satwt18) %>% filter(!is.na(satcurwt),!is.na(satwt18))
+descr(d,transpose = TRUE, style = 'rmarkdown')
+
+t.test(d$satwt18, d$satcurwt, paired = TRUE)
+
+#effect size
+cohen.d(d$satwt18, d$satcurwt, paired = TRUE)
+
+```
+
+## Section 2: Repeated-Measures ANOVA
+
+
+
+```{r repmea_aov, results='asis'}
+
+#https://gribblelab.wordpress.com/2009/03/09/repeated-measures-anova-using-r/
 
 ```
