@@ -1,0 +1,18 @@
+---
+title: "Assignment 2"
+author: "Steve Hawley"
+date: "November 18, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Section 0: Load the data and packages
+
+```{r}
+
+test<-1+1
+
+```
