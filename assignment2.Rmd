@@ -93,7 +93,7 @@ summary(aov_long)
 ```{r mixed_aov, results='asis'}
 
 #another approach: http://www.cookbook-r.com/Statistical_analysis/ANOVA/#mixed-design-anova
-aov.mix<-aov(value~satis*gender + Error(ID/satis), data=longdata)
+aov.mix<-aov(value~satis*gender + Error(ID/(satis*gender)), data=longdata)
 summary(aov.mix)
 
 ```
