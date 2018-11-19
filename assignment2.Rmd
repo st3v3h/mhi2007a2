@@ -27,6 +27,9 @@ data<-read.spss("Data+for+assignments.sav",to.data.frame = TRUE, add.undeclared.
 # import the spss file. Remove the labels (will need this later)
 data.xlab<-read.spss("Data+for+assignments.sav",to.data.frame = TRUE, use.value.labels = FALSE)
 
+#subset data for analysis
+rma<-data %>% select(code,gender,satcurwt,satwt18) %>% filter(!is.na(satcurwt),!is.na(satwt18),!is.na(gender)) %>% mutate(ID = seq.int(n()))
+
 # take a look at the data. See what the fields are
 head(data)
 
@@ -71,5 +74,25 @@ satmod<-lm(satBind~1)
 
 sataov<-Anova(satmod, idata = satFrm, idesign = ~satFac)
 summary(sataov)
+
+
+#another approach: http://www.cookbook-r.com/Statistical_analysis/ANOVA/#mixed-design-anova
+longdata<-gather(rma,satis,value,satcurwt:satwt18)
+head(longdata)
+longdata$ID<-factor(longdata$ID)
+aov_long<-aov(value~satis + Error(ID/satis), data=longdata)
+summary(aov_long)
+
+```
+
+## Section 3: Mixed ANOVA
+
+
+
+```{r mixed_aov, results='asis'}
+
+#another approach: http://www.cookbook-r.com/Statistical_analysis/ANOVA/#mixed-design-anova
+aov.mix<-aov(value~satis*gender + Error(ID/satis), data=longdata)
+summary(aov.mix)
 
 ```
