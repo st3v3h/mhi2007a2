@@ -61,6 +61,15 @@ cohen.d(d$satwt18, d$satcurwt, paired = TRUE)
 
 ```{r repmea_aov, results='asis'}
 
-#https://gribblelab.wordpress.com/2009/03/09/repeated-measures-anova-using-r/
+#https://www.r-bloggers.com/r-tutorial-series-one-way-repeated-measures-anova/
+sat<-c(1,2)
+satFac<-as.factor(sat)
+satFrm<-data.frame(satFac)
+satBind<-cbind(rma$satcurwt,rma$satwt18)
+
+satmod<-lm(satBind~1)
+
+sataov<-Anova(satmod, idata = satFrm, idesign = ~satFac)
+summary(sataov)
 
 ```
