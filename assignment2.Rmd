@@ -21,6 +21,7 @@ library(ggplot2) #for plotting
 library(effsize) #for cohen's d
 library(car) #for leven's test
 library(sjstats) #for eta squared
+library(tidyr) #for gather function
 
 # import the spss file. Label the factors
 data<-read.spss("Data+for+assignments.sav",to.data.frame = TRUE, add.undeclared.levels = "no")
