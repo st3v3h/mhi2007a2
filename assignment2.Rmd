@@ -25,21 +25,19 @@ library(tidyr) #for gather function
 
 # import the spss file. Label the factors
 data<-read.spss("Data+for+assignments.sav",to.data.frame = TRUE, add.undeclared.levels = "no")
-# import the spss file. Remove the labels (will need this later)
-data.xlab<-read.spss("Data+for+assignments.sav",to.data.frame = TRUE, use.value.labels = FALSE)
 
 #subset data for analysis
-rma<-data %>% select(code,gender,satcurwt,satwt18) %>% filter(!is.na(satcurwt),!is.na(satwt18),!is.na(gender)) %>% mutate(ID = seq.int(n()))
+rma<-data %>% 
+  select(code,age,gender,satcurwt,satwt18) %>% 
+  filter(!is.na(satcurwt),!is.na(satwt18),!is.na(gender), age>18) %>% 
+  mutate(ID = seq.int(n()))
 
 # take a look at the data. See what the fields are
-head(data)
+head(rma)
 
 #inspect the data types
-str(data)
+str(rma)
 
-#subset the numerical data for descriptives and factor data for frequency tables
-#there's probably a better way to do this, but this is easier
-data.fac<-select(data, -age,-code,-educ,-life,-confid, -satcurwt, -satwt18, -health)
 
 ```
 
@@ -49,13 +47,13 @@ data.fac<-select(data, -age,-code,-educ,-life,-confid, -satcurwt, -satwt18, -hea
 
 ```{r paired_samples, results='asis'}
 
-d<-data %>% select(satcurwt, satwt18) %>% filter(!is.na(satcurwt),!is.na(satwt18))
-descr(d,transpose = TRUE, style = 'rmarkdown')
+pst<-rma %>% select(satcurwt,satwt18)
+descr(pst, style = 'rmarkdown')
 
-t.test(d$satwt18, d$satcurwt, paired = TRUE)
+t.test(pst$satwt18, pst$satcurwt, paired = TRUE)
 
 #effect size
-cohen.d(d$satwt18, d$satcurwt, paired = TRUE)
+cohen.d(pst$satwt18, pst$satcurwt, paired = TRUE)
 
 ```
 
