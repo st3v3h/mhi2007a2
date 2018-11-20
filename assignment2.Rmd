@@ -47,9 +47,13 @@ str(rma)
 
 ```{r paired_samples, results='asis'}
 
+#subset the variables for paired samples t-test
 pst<-rma %>% select(satcurwt,satwt18)
+
+#get the descriptives
 descr(pst, style = 'rmarkdown')
 
+#run the t test
 t.test(pst$satwt18, pst$satcurwt, paired = TRUE)
 
 #effect size
@@ -63,24 +67,34 @@ cohen.d(pst$satwt18, pst$satcurwt, paired = TRUE)
 
 ```{r repmea_aov, results='asis'}
 
-#https://www.r-bloggers.com/r-tutorial-series-one-way-repeated-measures-anova/
-sat<-c(1,2)
-satFac<-as.factor(sat)
-satFrm<-data.frame(satFac)
-satBind<-cbind(rma$satcurwt,rma$satwt18)
+#Following the approach for repeated measures anova found here: http://www.cookbook-r.com/Statistical_analysis/ANOVA/#anovas-with-within-subjects-variables
+#First I need to reshape the data from wide to long for this to work
+longdata<-gather(rma,satis,value,satwt18:satcurwt)
 
-satmod<-lm(satBind~1)
-
-sataov<-Anova(satmod, idata = satFrm, idesign = ~satFac)
-summary(sataov)
-
-
-#another approach: http://www.cookbook-r.com/Statistical_analysis/ANOVA/#mixed-design-anova
-longdata<-gather(rma,satis,value,satcurwt:satwt18)
+#let's take a look
 head(longdata)
+
+#set up the data to plot. Order the factors
+longdata$satis<-factor(longdata$satis, levels = c("satwt18","satcurwt"))
+
+#group the data
+p<-longdata %>% group_by(satis) %>% summarise(satscore=mean(value))
+
+#line plot
+p %>%
+  ggplot(aes(x=satis, y=satscore, group=1)) +
+  geom_line() +
+  geom_point() +
+  expand_limits(y=c(0,10))
+
+#need to set the two timepoints (i.e., repeated IDs from the previously wide variables) as factors
 longdata$ID<-factor(longdata$ID)
+
+#Run the ANOVA
 aov_long<-aov(value~satis + Error(ID/satis), data=longdata)
 summary(aov_long)
+
+eta_sq(aov_long)
 
 ```
 
@@ -90,7 +104,7 @@ summary(aov_long)
 
 ```{r mixed_aov, results='asis'}
 
-#another approach: http://www.cookbook-r.com/Statistical_analysis/ANOVA/#mixed-design-anova
+#For the mixed anova, I'll follow the approach from the same website as the previous section: http://www.cookbook-r.com/Statistical_analysis/ANOVA/#mixed-design-anova
 aov.mix<-aov(value~satis*gender + Error(ID/(satis*gender)), data=longdata)
 summary(aov.mix)
 
