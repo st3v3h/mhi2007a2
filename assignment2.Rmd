@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Section 0: Load the data and packages
 
-```{r get_data, message=FALSE, results='markup'}
+```{r get_data, message=FALSE, results='markup', warning=FALSE}
 library(foreign) #for importing spss data
 library(summarytools) #for descriptive and cross tables
 library(dplyr) #for grouping and plotting
@@ -29,8 +29,8 @@ data<-read.spss("Data+for+assignments.sav",to.data.frame = TRUE, add.undeclared.
 #subset data for analysis
 rma<-data %>% 
   select(code,age,gender,satcurwt,satwt18) %>% 
-  filter(!is.na(satcurwt),!is.na(satwt18),!is.na(gender), age>18) %>% 
-  mutate(ID = seq.int(n()))
+  filter(!is.na(satcurwt),!is.na(satwt18),!is.na(gender), age>18) %>% #filtering out missing values and age<=18 (since one of the questions requires respondants to be at least 18)
+  mutate(ID = seq.int(n())) #have to re-assign unique IDs since the code variable is not unique for some reason
 
 # take a look at the data. See what the fields are
 head(rma)
@@ -41,8 +41,9 @@ str(rma)
 
 ```
 
-## Section 1: Pair-Samples t-test 
+## Section 1: Pair-Samples t-test
 
+#### **Research Question:** Is there a significant change in weight satisfaction in respondants' current weight compared to their weight at 18 years old?  
 
 
 ```{r paired_samples, results='asis'}
@@ -51,8 +52,10 @@ str(rma)
 pst<-rma %>% select(satcurwt,satwt18)
 
 #get the descriptives
-descr(pst, style = 'rmarkdown')
+descr(pst, style = 'rmarkdown', transpose = TRUE)
 
+```
+```{r paired_samples2}
 #run the t test
 t.test(pst$satwt18, pst$satcurwt, paired = TRUE)
 
@@ -60,14 +63,18 @@ t.test(pst$satwt18, pst$satcurwt, paired = TRUE)
 cohen.d(pst$satwt18, pst$satcurwt, paired = TRUE)
 
 ```
+####Results (APA Style)
+A paired-samples _t_ test was conducted to evaluate whether the respondants experienced a change in life satisfaction between 18 years old and their current age. The results indicated that the mean weight satisfaction at age 18 ( _M_=7.09, _SD_=2.57) was significantly greater than the mean weight satisfaction at the respondants' current age ( _M_=5.94, _SD_=2.70), _t_(647) = 10.233, _p_<0.001. The standarized effect size index, _d_, was 0.40, which indicates a small effect size of this difference. The 95% confidence interval for the mean difference between the weight satisfaction at 18 and current age was 0.29 to 0.51.
 
 ## Section 2: Repeated-Measures ANOVA
 
+#### **Research Question:** Is there a significant change in weight satisfaction in respondants' current weight compared to their weight at 18 years old?  
 
 
-```{r repmea_aov, results='asis'}
+```{r repmea_aov}
 
-#Following the approach for repeated measures anova found here: http://www.cookbook-r.com/Statistical_analysis/ANOVA/#anovas-with-within-subjects-variables
+#Following the approach for repeated measures anova found here: 
+#http://www.cookbook-r.com/Statistical_analysis/ANOVA/#anovas-with-within-subjects-variables
 #First I need to reshape the data from wide to long for this to work
 longdata<-gather(rma,satis,value,satwt18:satcurwt)
 
@@ -85,7 +92,8 @@ p %>%
   ggplot(aes(x=satis, y=satscore, group=1)) +
   geom_line() +
   geom_point() +
-  expand_limits(y=c(0,10))
+  expand_limits(y=c(0,10)) +
+  xlab("")
 
 #need to set the two timepoints (i.e., repeated IDs from the previously wide variables) as factors
 longdata$ID<-factor(longdata$ID)
@@ -100,11 +108,26 @@ eta_sq(aov_long)
 
 ## Section 3: Mixed ANOVA
 
+#### **Research Question:** Is there a significant change in weight satisfaction in respondants' current weight compared to their weight at 18 years old and is this change different for males and females?
 
 
-```{r mixed_aov, results='asis'}
+```{r mixed_aov}
 
-#For the mixed anova, I'll follow the approach from the same website as the previous section: http://www.cookbook-r.com/Statistical_analysis/ANOVA/#mixed-design-anova
+#For the mixed anova, I'll follow the approach from the same site as the previous section: 
+#http://www.cookbook-r.com/Statistical_analysis/ANOVA/#mixed-design-anova
+#Run the anova, this time with an additional factor
+
+#group the data
+p<-longdata %>% group_by(satis, gender) %>% summarise(satscore=mean(value))
+
+#let's see if the lines are parellel (i.e., no interaction effect)
+p %>%
+  ggplot(aes(x=satis, y=satscore, color=gender, group=gender)) +
+  geom_line() +
+  geom_point() +
+  expand_limits(y=c(0,10)) +
+  xlab("")
+
 aov.mix<-aov(value~satis*gender + Error(ID/(satis*gender)), data=longdata)
 summary(aov.mix)
 
