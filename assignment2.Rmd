@@ -75,7 +75,8 @@ A paired-samples _t_ test was conducted to evaluate whether the respondants expe
 
 #Following the approach for repeated measures anova found here: 
 #http://www.cookbook-r.com/Statistical_analysis/ANOVA/#anovas-with-within-subjects-variables
-#First I need to reshape the data from wide to long for this to work
+#First I need to reshape the data from wide to long for this to work.
+#This is where I'll need the unique ID variable I created earlier. I'll also need to put satwt18 and satcurwt into a single column as labels, with 'value' as their values.
 longdata<-gather(rma,satis,value,satwt18:satcurwt)
 
 #let's take a look
@@ -84,10 +85,10 @@ head(longdata)
 #set up the data to plot. Order the factors
 longdata$satis<-factor(longdata$satis, levels = c("satwt18","satcurwt"))
 
-#group the data
+#group the data for plotting
 p<-longdata %>% group_by(satis) %>% summarise(satscore=mean(value))
 
-#line plot
+#line plot to look at the change in weight satisfaction between age 18 and current weight
 p %>%
   ggplot(aes(x=satis, y=satscore, group=1)) +
   geom_line() +
@@ -105,6 +106,8 @@ summary(aov_long)
 eta_sq(aov_long)
 
 ```
+####Results (APA Style)
+A one-way within-subjects ANOVA was conducted with the factor being age and the dependant variable being weight satisfaction score. The results of ANOVA indicated a significant age effect, F(1,647) = 104.7 , p<0.001, multivariate eta-squared = 0.045. No pairwise comparisons were conducted, as only two groups were present in the ANOVA. Thus, the ANOVA shows that the mean weight satisfaction at 18 years old was significantly greater ( _M_=7.09, _SD_=2.57) than the mean weight satisfaction at the respondants' current age ( _M_=5.94, _SD_=2.70).
 
 ## Section 3: Mixed ANOVA
 
@@ -117,18 +120,31 @@ eta_sq(aov_long)
 #http://www.cookbook-r.com/Statistical_analysis/ANOVA/#mixed-design-anova
 #Run the anova, this time with an additional factor
 
-#group the data
+#break down the descriptives to male and female
+pst_m<-rma %>% filter(gender=='male')%>% select(satcurwt,satwt18) 
+pst_f<-rma %>% filter(gender=='female') %>% select(satcurwt,satwt18) 
+
+descr(pst_m, style = 'rmarkdown', transpose = TRUE)
+descr(pst_f, style = 'rmarkdown', transpose = TRUE)
+
+
+#group the data for plotting
 p<-longdata %>% group_by(satis, gender) %>% summarise(satscore=mean(value))
 
-#let's see if the lines are parellel (i.e., no interaction effect)
+#let's see if the lines are (roughly) parellel (i.e., no interaction effect)
 p %>%
   ggplot(aes(x=satis, y=satscore, color=gender, group=gender)) +
   geom_line() +
   geom_point() +
   expand_limits(y=c(0,10)) +
-  xlab("")
+  xlab("") +
+  scale_y_continuous(breaks = c(0,2,4,6,8,10))
 
 aov.mix<-aov(value~satis*gender + Error(ID/(satis*gender)), data=longdata)
 summary(aov.mix)
 
+eta_sq(aov.mix)
+
 ```
+####Results (APA Style)
+A mixed-design ANOVA with age as a within-subjects effect and gender as a between-subjects effect was conducted to evalute the change in weight satisfaction between age 18 and current age between males and females. The results of then ANOVA indicated no significant interaction between age and gender F(1,646) = 0.57, p = 0.45, multivariate eta_squared = 0.00. The results of ANOVA indicated a significant age effect, F(1,647) = 104.7 , p<0.001, multivariate eta-squared = 0.045. and a significant gender effect F(1,646) = 12.69, P<0.001, multivariate eta-squared = 0.013. No pairwise comparisons were conducted, as only two groups were present for each effect in the ANOVA. Thus, the ANOVA shows that the mean weight satisfaction at 18 years old was significantly greater than the mean weight satisfaction at the respondants' current age for both genders, with males having significantly greater weight satisfaction scores at both time points.
