@@ -94,7 +94,8 @@ p %>%
   geom_line() +
   geom_point() +
   expand_limits(y=c(0,10)) +
-  xlab("")
+  xlab("") +
+  scale_y_continuous(breaks = c(0,2,4,6,8,10))
 
 #need to set the two timepoints (i.e., repeated IDs from the previously wide variables) as factors
 longdata$ID<-factor(longdata$ID)
@@ -114,7 +115,7 @@ A one-way within-subjects ANOVA was conducted with the factor being age and the 
 #### **Research Question:** Is there a significant change in weight satisfaction in respondants' current weight compared to their weight at 18 years old and is this change different for males and females?
 
 
-```{r mixed_aov}
+```{r mixed_aov, results='asis'}
 
 #For the mixed anova, I'll follow the approach from the same site as the previous section: 
 #http://www.cookbook-r.com/Statistical_analysis/ANOVA/#mixed-design-anova
@@ -124,10 +125,12 @@ A one-way within-subjects ANOVA was conducted with the factor being age and the 
 pst_m<-rma %>% filter(gender=='male')%>% select(satcurwt,satwt18) 
 pst_f<-rma %>% filter(gender=='female') %>% select(satcurwt,satwt18) 
 
+#males
 descr(pst_m, style = 'rmarkdown', transpose = TRUE)
+#females
 descr(pst_f, style = 'rmarkdown', transpose = TRUE)
-
-
+```
+```{r mixed_aov2}
 #group the data for plotting
 p<-longdata %>% group_by(satis, gender) %>% summarise(satscore=mean(value))
 
