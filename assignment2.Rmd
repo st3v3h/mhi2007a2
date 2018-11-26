@@ -2,8 +2,10 @@
 title: "Assignment 2"
 author: "Steve Hawley"
 date: "November 18, 2018"
-output: html_document
-editor_options: 
+output:
+  word_document: default
+  html_document: default
+editor_options:
   chunk_output_type: console
 ---
 
@@ -15,11 +17,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r get_data, message=FALSE, results='markup', warning=FALSE}
 library(foreign) #for importing spss data
-library(summarytools) #for descriptive and cross tables
+library(summarytools) #for descriptives
 library(dplyr) #for grouping and plotting
 library(ggplot2) #for plotting
 library(effsize) #for cohen's d
-library(car) #for leven's test
 library(sjstats) #for eta squared
 library(tidyr) #for gather function
 
@@ -64,7 +65,7 @@ cohen.d(pst$satwt18, pst$satcurwt, paired = TRUE)
 
 ```
 ####Results (APA Style)
-A paired-samples _t_ test was conducted to evaluate whether the respondants experienced a change in life satisfaction between 18 years old and their current age. The results indicated that the mean weight satisfaction at age 18 ( _M_=7.09, _SD_=2.57) was significantly greater than the mean weight satisfaction at the respondants' current age ( _M_=5.94, _SD_=2.70), _t_(647) = 10.233, _p_<0.001. The standarized effect size index, _d_, was 0.40, which indicates a small effect size of this difference. The 95% confidence interval for the mean difference between the weight satisfaction at 18 and current age was 0.29 to 0.51.
+A paired-samples _t_ test was conducted to evaluate whether the respondants experienced a change in life satisfaction between 18 years old and their current age. The results indicated that the mean weight satisfaction at age 18 ( _M_=7.09, _SD_=2.57) was significantly greater than the mean weight satisfaction at the respondants' current age ( _M_=5.94, _SD_=2.70), _t_(647) = 10.233, _p_<0.001. The standarized effect size index, _d_, was 0.40, which indicates a small effect size of this difference. The 95% confidence interval for the mean difference between the weight satisfaction at 18 and current age was 0.92 to 1.37.
 
 ## Section 2: Repeated-Measures ANOVA
 
