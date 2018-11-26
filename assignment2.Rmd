@@ -143,11 +143,11 @@ p %>%
   xlab("") +
   scale_y_continuous(breaks = c(0,2,4,6,8,10))
 
-aov.mix<-aov(value~satis*gender + Error(ID/(satis*gender)), data=longdata)
+aov.mix<-aov(value~satis*gender + Error(ID/(satis))+gender, data=longdata)
 summary(aov.mix)
 
 eta_sq(aov.mix)
 
 ```
 ####Results (APA Style)
-A mixed-design ANOVA with age as a within-subjects effect and gender as a between-subjects effect was conducted to evalute the change in weight satisfaction between age 18 and current age between males and females. The results of then ANOVA indicated no significant interaction between age and gender F(1,646) = 0.57, p = 0.45, multivariate eta_squared = 0.00. The results of ANOVA indicated a significant age effect, F(1,647) = 104.7 , p<0.001, multivariate eta-squared = 0.045. and a significant gender effect F(1,646) = 12.69, P<0.001, multivariate eta-squared = 0.013. No pairwise comparisons were conducted, as only two groups were present for each effect in the ANOVA. Thus, the ANOVA shows that the mean weight satisfaction at 18 years old was significantly greater than the mean weight satisfaction at the respondants' current age for both genders, with males having significantly greater weight satisfaction scores at both time points.
+A mixed-design ANOVA with age as a within-subjects effect and gender as a between-subjects effect was conducted to evalute the change in weight satisfaction between age 18 and current age between males and females. The results of then ANOVA indicated no significant interaction between age and gender F(1,646) = 0.57, p = 0.45, multivariate eta_squared = 0.00. The results of ANOVA indicated a significant age effect, F(1,647) = 104.7 , p<0.001, multivariate eta-squared = 0.045. and a significant gender effect F(1,646) = 12.69, P<0.001, multivariate eta-squared = 0.013. No pairwise comparisons were conducted, as only two groups were present for each effect in the ANOVA. Thus, the ANOVA shows that the mean weight satisfaction at 18 years old was significantly greater than the mean weight satisfaction at the respondants' current age for both genders with males having significantly greater weight satisfaction scores at both time points.
